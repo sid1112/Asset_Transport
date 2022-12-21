@@ -5,6 +5,7 @@ from .models import Requester, Riders
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
 from django.core.paginator import Paginator
+from django.utils import timezone
 
 pageSize = 2
 
@@ -28,8 +29,12 @@ def requesterListView(request):
             page = request.GET['page']
             p = Paginator(requests, pageSize)
             requests = p.page(page)
-        ##TODO LOOP requests and add EXPIRED status if datetime exceeds
         serializer = RequesterSerializer(requests, many=True)
+        ##TODO uncomment for EXPIRED check whether it have to shown when status filter is PENDING
+        # format_date = "%Y-%m-%dT%H:%M:%S%z"
+        # for requester in serializer.data:
+        #     if datetime.strptime(requester.get('dateTime'), format_date) < timezone.now():
+        #         requester['status'] = "EXPIRED"
         return JsonResponse({"data": serializer.data, "page": page}, safe=False)
     if request.method == 'POST':
         data = JSONParser().parse(request)
@@ -69,7 +74,6 @@ def riderView(request, pk):
     if request.method == 'PUT':
         jsonData = JSONParser().parse(request)
         serializer = RiderSerializer(rider, data=jsonData)
-        # print("serializer_data ",serializer.data)
         if serializer.is_valid():
             serializer.save()
             return JsonResponse(serializer.data, safe=False)
@@ -96,7 +100,7 @@ def matchedTransportRequestListView(request):
             raise Exception("input correct date as %d-%m-%Y %H:%M")
         filters["toLocation"] = jsonData.get("toLocation")
         filters["fromLocation"] = jsonData.get("fromLocation")
-        filters["status"] = "NOTAPPLIED"
+        # filters["status"] = "NOTAPPLIED"
         page = None
         requests = Riders.objects.filter(**filters)
         if request.GET.get('page'):
