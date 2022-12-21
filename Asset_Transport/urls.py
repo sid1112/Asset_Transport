@@ -21,6 +21,9 @@ from test1.views import employeeDetailView
 from test1.views import userListView
 from test1.views import requesterListView
 from test1.views import riderListView
+from test1.views import riderView
+from test1.views import matchedTransportRequestListView
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -28,5 +31,8 @@ urlpatterns = [
     path('api/employee/<int:pk>', employeeDetailView),
     path('api/user/', userListView),
     path('api/requester/', requesterListView),
-path('api/rider/', riderListView)
+    path('api/rider/', riderListView),
+    path('api/rider/<int:pk>', riderView),
+    path('api/matchAssetTransport/', matchedTransportRequestListView)
+
 ]
