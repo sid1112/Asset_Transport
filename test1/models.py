@@ -3,14 +3,6 @@ from django.db import models
 from test1.enums import *
 
 
-# Create your models here.
-class Employee(models.Model):
-    name = models.CharField(max_length=30)
-    email = models.EmailField()
-    password = models.CharField(max_length=30)
-    phone = models.CharField(max_length=30)
-
-
 class Requester(models.Model):
     fromLocation = models.CharField(max_length=255)
     toLocation = models.CharField(max_length=255)

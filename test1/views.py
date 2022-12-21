@@ -1,78 +1,24 @@
 from datetime import date, datetime
-from django.shortcuts import render
 from django.http import JsonResponse, HttpResponse
-# Create your views here.
-from .serializers import EmpoyeeSerializer, UserSerializer, RequesterSerializer, RiderSerializer
-from .models import Employee, Requester, Riders
-from django.contrib.auth.models import User
+from .serializers import RequesterSerializer, RiderSerializer
+from .models import Requester, Riders
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
-from test1.enums import *
 from django.core.paginator import Paginator
 
 pageSize = 2
 
 
 @csrf_exempt
-def employeeListView(request):
-    if request.method == 'GET':
-        employees = Employee.objects.all()
-        serializer = EmpoyeeSerializer(employees, many=True)
-        return JsonResponse(serializer.data, safe=False)
-    elif request.method == 'POST':
-        data = JSONParser().parse(request)
-        serializer = EmpoyeeSerializer(data=data)
-        if serializer.is_valid():
-            serializer.save()
-            return JsonResponse(serializer.data, safe=False)
-        return JsonResponse(serializer.errors, safe=False)
-
-
-@csrf_exempt
-def employeeDetailView(request, pk):
-    try:
-        employee = Employee.objects.get(pk=pk)
-    except Employee.DoesNotExist:
-        return HttpResponse(status=404)
-    print(employee)
-    if request.method == 'GET':
-        serializer = EmpoyeeSerializer(employee)
-        return JsonResponse(serializer.data)
-    if request.method == 'DELETE':
-        employee.delete()
-        return HttpResponse(status=204)
-    if request.method == 'PUT':
-        jsonData = JSONParser().parse(request)
-        print("pu reqeuest", jsonData)
-        serializer = EmpoyeeSerializer(employee, data=jsonData)
-        # print("serializer_data ",serializer.data)
-        if serializer.is_valid():
-            serializer.save()
-            print("reached_here1 ", serializer.data)
-            return JsonResponse(serializer.data, safe=False)
-        print("4error")
-        return JsonResponse(serializer.errors, safe=False)
-    return HttpResponse(401)
-
-
-def userListView(request):
-    users = User.objects.all()
-    serializer = UserSerializer(users, many=True)
-    return JsonResponse(serializer.data, safe=False)
-
-
-@csrf_exempt
 def requesterListView(request):
-    print("hello")
     if request.method == 'GET':
-        # requests = Requester.objects.all()
         filters = {}
         if request.GET.get('status'):
             filters['status'] = request.GET['status']
-        if request.GET['assetType']:
+        if request.GET.get('assetType'):
             filters['assetType'] = request.GET['assetType']
         requests = Requester.objects.filter(**filters)
-        if request.GET['sortDateTime']:
+        if request.GET.get('sortDateTime'):
             if request.GET['sortDateTime'] == 'DESC':
                 requests = requests.order_by('dateTime')
             else:
@@ -97,7 +43,6 @@ def requesterListView(request):
 
 @csrf_exempt
 def riderListView(request):
-    print("hello")
     if request.method == 'GET':
         requests = Riders.objects.all()
         serializer = RiderSerializer(requests, many=True)
@@ -114,7 +59,6 @@ def riderListView(request):
 
 @csrf_exempt
 def riderView(request, pk):
-    print("hello")
     try:
         rider = Riders.objects.get(pk=pk)
     except Riders.DoesNotExist:
@@ -124,23 +68,21 @@ def riderView(request, pk):
         return JsonResponse(serializer.data)
     if request.method == 'PUT':
         jsonData = JSONParser().parse(request)
-        print("pu reqeuest1", jsonData)
-        print("iewp", rider, jsonData)
         serializer = RiderSerializer(rider, data=jsonData)
         # print("serializer_data ",serializer.data)
         if serializer.is_valid():
             serializer.save()
-            print("reached_here1 ", serializer.data)
             return JsonResponse(serializer.data, safe=False)
-        print("4error")
         return JsonResponse(serializer.errors, safe=False)
+    if request.method == 'DELETE':
+        rider.delete()
+        return HttpResponse(status=204)
 
 
 @csrf_exempt
 def matchedTransportRequestListView(request):
     if request.method == 'GET':
         jsonData = JSONParser().parse(request)
-        requester = Requester(**jsonData)
         filters = {}
         if "dateTime" not in jsonData or "toLocation" not in jsonData or "fromLocation" not in jsonData:
             return HttpResponse(400)
