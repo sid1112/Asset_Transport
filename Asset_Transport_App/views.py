@@ -8,6 +8,7 @@ from django.core.paginator import Paginator
 from django.utils import timezone
 
 pageSize = 2
+format_date = "%Y-%m-%dT%H:%M:%S%z"
 
 
 @csrf_exempt
@@ -30,11 +31,9 @@ def requesterListView(request):
             p = Paginator(requests, pageSize)
             requests = p.page(page)
         serializer = RequesterSerializer(requests, many=True)
-        ##TODO uncomment for EXPIRED check whether it have to shown when status filter is PENDING
-        # format_date = "%Y-%m-%dT%H:%M:%S%z"
-        # for requester in serializer.data:
-        #     if datetime.strptime(requester.get('dateTime'), format_date) < timezone.now():
-        #         requester['status'] = "EXPIRED"
+        for requester in serializer.data:
+            if datetime.strptime(requester.get('dateTime'), format_date) < timezone.now():
+                requester['status'] = "EXPIRED"
         return JsonResponse({"data": serializer.data, "page": page}, safe=False)
     if request.method == 'POST':
         data = JSONParser().parse(request)
@@ -100,7 +99,6 @@ def matchedTransportRequestListView(request):
             raise Exception("input correct date as %d-%m-%Y %H:%M")
         filters["toLocation"] = jsonData.get("toLocation")
         filters["fromLocation"] = jsonData.get("fromLocation")
-        # filters["status"] = "NOTAPPLIED"
         page = None
         requests = Riders.objects.filter(**filters)
         if request.GET.get('page'):

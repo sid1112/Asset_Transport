@@ -37,7 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'test1',
+    'Asset_Transport_App',
     'rest_framework'
 ]
 

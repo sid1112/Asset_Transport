@@ -1,6 +1,6 @@
 from django.db import models
 
-from test1.enums import *
+from Asset_Transport_App.enums import *
 
 
 class Requester(models.Model):

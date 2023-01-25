@@ -1,10 +1,10 @@
 from django.contrib import admin
 from django.urls import path
 
-from test1.views import requesterListView
-from test1.views import riderListView
-from test1.views import riderView
-from test1.views import matchedTransportRequestListView
+from Asset_Transport_App.views import requesterListView
+from Asset_Transport_App.views import riderListView
+from Asset_Transport_App.views import riderView
+from Asset_Transport_App.views import matchedTransportRequestListView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
